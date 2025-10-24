@@ -154,9 +154,9 @@
       font-size:13px;
       background:linear-gradient(90deg,var(--accent), #2dd4bf);
       color:#061220;
-      border: none;
-      box-shadow: 0 8px 20px rgba(124,92,255,0.12);
-      transition: transform .12s;
+      border:none;
+      box-shadow:0 8px 20px rgba(124,92,255,0.12);
+      transition: transform .12s, box-shadow .12s;
     }
     .btn:active{ transform: translateY(1px) }
 
@@ -173,26 +173,72 @@
 
     .small{font-size:13px;color:var(--muted)}
 
+    /* Toast Notification Styles - Improved */
     .toast{
       position:fixed;
       right:20px;
       bottom:24px;
-      background: rgba(10,14,20,0.86);
-      padding:12px 16px;
-      border-radius:10px;
-      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      background: rgba(10,14,20,0.95);
+      padding:14px 18px;
+      border-radius:12px;
+      box-shadow: 0 12px 40px rgba(2,6,23,0.8), 0 0 0 1px rgba(124,92,255,0.1);
       color:#e6eef8;
-      transform: translateY(14px);
       opacity:0;
       pointer-events:none;
-      transition: all .28s cubic-bezier(.2,.9,.25,1);
+      transform:translateY(20px);
+      animation-duration:0.4s;
       z-index:9999;
-      border:1px solid rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 320px;
     }
-    .toast.show{
-      transform: translateY(0);
-      opacity:1;
-      pointer-events:auto;
+
+    .toast.show {
+      animation: fadeInUp 0.4s ease forwards, fadeOut 0.4s ease 2.2s forwards;
+    }
+
+    .toast-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #2dd4bf);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .toast-icon svg {
+      width: 12px;
+      height: 12px;
+      fill: #061220;
+    }
+
+    .toast-content {
+      flex: 1;
+    }
+
+    .toast-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    .toast-message {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity:0; transform:translateY(20px); }
+      100% { opacity:1; transform:translateY(0); }
+    }
+    @keyframes fadeOut {
+      0% { opacity:1; transform:translateY(0); }
+      100% { opacity:0; transform:translateY(10px); }
     }
 
     footer{
@@ -206,6 +252,11 @@
       header{flex-direction:column; align-items:flex-start; gap:10px}
       .actions{ margin-left:0 }
       .card{ padding:12px }
+      .toast {
+        right: 16px;
+        left: 16px;
+        max-width: none;
+      }
     }
   </style>
 </head>
@@ -214,7 +265,7 @@
     <header>
       <div class="brand">
         <div class="logo">
-          <img src="https://ibb.co.com/HfkrgrP0" alt="Elaina Pedia Logo">
+          <img src="https://i.ibb.co/6YqLtWg/elaina-logo.png" alt="Elaina Pedia Logo">
         </div>
         <div>
           <h1>Elaina Pedia</h1>
@@ -283,13 +334,25 @@
       </section>
     </main>
 
-    <div id="toast" class="toast">Disalin ke clipboard</div>
+    <div id="toast" class="toast">
+      <div class="toast-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+      </div>
+      <div class="toast-content">
+        <div class="toast-title">Berhasil Disalin</div>
+        <div class="toast-message">Nomor pembayaran telah disalin ke clipboard</div>
+      </div>
+    </div>
 
     <footer>© <strong>Elaina Pedia</strong> — Pastikan nomor tujuan benar sebelum transfer.</footer>
   </div>
 
   <script>
     const toastEl = document.getElementById('toast');
+    const toastTitle = toastEl.querySelector('.toast-title');
+    const toastMessage = toastEl.querySelector('.toast-message');
 
     document.querySelectorAll('.btn.copy').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -297,20 +360,22 @@
         const payment = btn.getAttribute('data-payment');
         try {
           await navigator.clipboard.writeText(number);
-          showToast(`Nomor ${payment} Berhasil Disalin`);
+          showToast(`Nomor ${payment} Berhasil Disalin`, `Nomor ${number} telah disalin ke clipboard`);
           btn.textContent = 'Copied';
           setTimeout(() => btn.textContent = 'Copy', 1200);
         } catch {
-          showToast('Gagal menyalin nomor');
+          showToast('Gagal Menyalin', 'Terjadi kesalahan saat menyalin nomor');
         }
       });
     });
 
-    function showToast(message) {
-      toastEl.textContent = message;
+    function showToast(title, message) {
+      toastTitle.textContent = title;
+      toastMessage.textContent = message;
+      toastEl.classList.remove('show');
+      void toastEl.offsetWidth; // restart animation
       toastEl.classList.add('show');
-      setTimeout(() => toastEl.classList.remove('show'), 2600);
     }
   </script>
 </body>
-  </html>
+</html>
