@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Elaina Pedia — Pembayaran</title>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --muted:#9aa4b2;
+      --accent:#7c5cff;
+      --glass: rgba(255,255,255,0.03);
+      --glass-2: rgba(255,255,255,0.02);
+      --radius: 14px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: radial-gradient(1000px 600px at 10% 10%, rgba(124,92,255,0.12), transparent 8%),
+                  radial-gradient(800px 500px at 90% 90%, rgba(34,197,94,0.06), transparent 8%),
+                  var(--bg);
+      color:#e6eef8;
+      -webkit-font-smoothing:antialiased;
+      padding:32px;
+    }
+
+    .container{
+      max-width:980px;
+      margin:0 auto;
+      display:grid;
+      gap:20px;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      padding:18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      border-radius: var(--radius);
+      box-shadow: 0 6px 20px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .brand {
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+
+    .logo{
+      width:56px;
+      height:56px;
+      border-radius:12px;
+      overflow:hidden;
+      background:linear-gradient(135deg,var(--accent), #2dd4bf);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .logo img{width:100%; height:100%; object-fit:cover; display:block}
+
+    h1{
+      font-size:20px;
+      margin:0;
+      letter-spacing:0.2px;
+    }
+
+    p.lead{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .cards{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap:18px;
+    }
+
+    .card{
+      background: linear-gradient(180deg,var(--glass), var(--glass-2));
+      border-radius: 12px;
+      padding:14px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      border:1px solid rgba(255,255,255,0.03);
+      transition: transform .22s ease, box-shadow .22s ease;
+    }
+    .card:hover{ transform: translateY(-6px); box-shadow: 0 14px 30px rgba(2,6,23,0.6) }
+
+    .pay-logo{
+      width:68px;
+      height:68px;
+      flex-shrink:0;
+      border-radius:10px;
+      overflow:hidden;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .pay-logo img{width:100%;height:100%;object-fit:cover;display:block}
+
+    .info{
+      flex:1;
+      min-width:0;
+    }
+    .info .name{
+      font-weight:600;
+      margin:0 0 6px 0;
+    }
+    .info .method{
+      font-size:13px;
+      color:var(--muted);
+      margin:0 0 10px 0;
+    }
+
+    .number-row{
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    .number{
+      background: rgba(0,0,0,0.15);
+      border-radius:10px;
+      padding:8px 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+      font-size:13px;
+      color:#eaf2ff;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .actions{
+      display:flex;
+      gap:8px;
+      margin-left:auto;
+    }
+
+    .btn{
+      border:0;
+      padding:9px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:13px;
+      background:linear-gradient(90deg,var(--accent), #2dd4bf);
+      color:#061220;
+      border: none;
+      box-shadow: 0 8px 20px rgba(124,92,255,0.12);
+      transition: transform .12s;
+    }
+    .btn:active{ transform: translateY(1px) }
+
+    .wallet-summary{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px;
+      border-radius:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    .small{font-size:13px;color:var(--muted)}
+
+    .toast{
+      position:fixed;
+      right:20px;
+      bottom:24px;
+      background: rgba(10,14,20,0.86);
+      padding:12px 16px;
+      border-radius:10px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      color:#e6eef8;
+      transform: translateY(14px);
+      opacity:0;
+      pointer-events:none;
+      transition: all .28s cubic-bezier(.2,.9,.25,1);
+      z-index:9999;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .toast.show{
+      transform: translateY(0);
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    footer{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:13px;
+      text-align:center;
+    }
+
+    @media (max-width:520px){
+      header{flex-direction:column; align-items:flex-start; gap:10px}
+      .actions{ margin-left:0 }
+      .card{ padding:12px }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">
+          <img src="https://ibb.co.com/HfkrgrP0" alt="Elaina Pedia Logo">
+        </div>
+        <div>
+          <h1>Elaina Pedia</h1>
+          <p class="lead">Klik "Copy" untuk menyalin nomor pembayaran pilihanmu.</p>
+        </div>
+      </div>
+      <div style="margin-left:auto;">
+        <div class="wallet-summary">
+          <div>
+            <div style="font-weight:700">Metode Tersedia</div>
+            <div class="small">Dana · GoPay · ShopeePay · SeaBank</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="cards">
+        <article class="card">
+          <div class="pay-logo"><img src="https://files.catbox.moe/urdkaj.png" alt="Dana"></div>
+          <div class="info">
+            <div class="name">Dana</div>
+            <div class="method">E-wallet</div>
+            <div class="number-row"><span class="number">0881011892305</span></div>
+          </div>
+          <div class="actions">
+            <button class="btn copy" data-payment="Dana" data-target="0881011892305">Copy</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="pay-logo"><img src="https://files.catbox.moe/jzaem7.png" alt="GoPay"></div>
+          <div class="info">
+            <div class="name">GoPay</div>
+            <div class="method">E-wallet</div>
+            <div class="number-row"><span class="number">083872735436</span></div>
+          </div>
+          <div class="actions">
+            <button class="btn copy" data-payment="GoPay" data-target="083872735436">Copy</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="pay-logo"><img src="https://files.catbox.moe/fxamkq.png" alt="ShopeePay"></div>
+          <div class="info">
+            <div class="name">ShopeePay</div>
+            <div class="method">E-wallet</div>
+            <div class="number-row"><span class="number">087735073038</span></div>
+          </div>
+          <div class="actions">
+            <button class="btn copy" data-payment="ShopeePay" data-target="087735073038">Copy</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="pay-logo"><img src="https://files.catbox.moe/lzg4s8.png" alt="SeaBank"></div>
+          <div class="info">
+            <div class="name">SeaBank</div>
+            <div class="method">Bank / Rekening</div>
+            <div class="number-row"><span class="number">901019568318</span></div>
+          </div>
+          <div class="actions">
+            <button class="btn copy" data-payment="SeaBank" data-target="901019568318">Copy</button>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <div id="toast" class="toast">Disalin ke clipboard</div>
+
+    <footer>© <strong>Elaina Pedia</strong> — Pastikan nomor tujuan benar sebelum transfer.</footer>
+  </div>
+
+  <script>
+    const toastEl = document.getElementById('toast');
+
+    document.querySelectorAll('.btn.copy').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const number = btn.getAttribute('data-target');
+        const payment = btn.getAttribute('data-payment');
+        try {
+          await navigator.clipboard.writeText(number);
+          showToast(`Nomor ${payment} Berhasil Disalin`);
+          btn.textContent = 'Copied';
+          setTimeout(() => btn.textContent = 'Copy', 1200);
+        } catch {
+          showToast('Gagal menyalin nomor');
+        }
+      });
+    });
+
+    function showToast(message) {
+      toastEl.textContent = message;
+      toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 2600);
+    }
+  </script>
+</body>
+  </html>
